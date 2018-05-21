@@ -44,3 +44,83 @@ catch_df <- catch_df %>%
 
 Selecting columns by name is more powerful; accounts for changes to DF that may change row/column numbers. 
 
+```{r}
+catch_df <- catch_df %>% 
+  gather(key = Species, value = Catch, -Region, -Year)
+
+head(catch_df)
+```
+
+```{r}
+catch_df %>% 
+  spread(key=Species, value=Catch) 
+```
+
+Goes back to a wide frame. 
+
+```{r}
+catch_df <- catch_df %>% 
+  rename(catch_thousands = Catch)
+
+head(catch_df)
+```
+
+```{r}
+catch_df %>% 
+  mutate(catch = catch_thousands*1000)
+```
+
+Error because catch_thousands is a character vector. 
+
+```{r}
+test <- as.integer(catch_df$catch_thousands)
+which(is.na(test==TRUE))
+```
+
+```{r}
+catch_df[401, ]
+```
+
+```{r}
+View(catch_df)
+```
+
+```{r}
+catch_df <- catch_df %>% 
+  mutate(catch_thousands = ifelse(catch_thousands == "I", 1, catch_thousands)) %>% 
+  mutate(catch_thousands = as.integer(catch_thousands)) %>% 
+  mutate(catch = catch_thousands*1000)
+
+```
+
+```{r}
+head(catch_df, 30)
+```
+
+#Analysis
+
+```{r}
+catch_df %>% 
+  group_by(Species) %>% 
+  summarize(mean_catch = mean(catch))
+```
+
+```{r}
+catch_df %>% 
+  group_by(Region) %>%
+  summarize(n = n())
+```
+
+```{r}
+catch_df %>% 
+  filter(Region == "SSE") %>% 
+  head()
+```
+
+```{r}
+catch_df %>% 
+  group_by(Region) %>% 
+  summarise(mean_catch = mean(catch, na.rm=TRUE)) %>% 
+  arrange(desc(mean_catch))
+```
+
